@@ -1,6 +1,6 @@
 import React from 'react';
-import { PostGenerator } from './components/PostGenerator';
 import { Hero } from './components/Hero';
+import { PostGenerator } from './components/PostGenerator';
 
 function App() {
   return (
