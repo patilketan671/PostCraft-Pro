@@ -43,27 +43,37 @@ export function PostGenerator() {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'post' | 'profile') => {
     const file = event.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size too large. Please choose a file under 5MB.');
+        return;
+      }
+
       const reader = new FileReader();
       
-      const imageLoadPromise = new Promise((resolve) => {
-        reader.onloadend = () => {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        await new Promise((resolve, reject) => {
           const img = new Image();
-          img.src = reader.result as string;
-          img.onload = () => {
-            resolve(reader.result);
-          };
-        };
-      });
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = result as string;
+        });
 
-      reader.readAsDataURL(file);
-
-      const result = await imageLoadPromise;
-      
-      if (type === 'post') {
-        setImageUrl(result as string);
-      } else {
-        setProfilePic(result as string);
-        setDefaultProfilePic(result as string);
+        if (type === 'post') {
+          setImageUrl(result as string);
+        } else {
+          setProfilePic(result as string);
+          setDefaultProfilePic(result as string);
+          setProfileImageData(result as string);
+        }
+      } catch (error) {
+        console.error('Error processing image:', error);
+        alert('Error processing image. Please try another image.');
       }
     }
   };
@@ -71,13 +81,26 @@ export function PostGenerator() {
   const downloadPost = async () => {
     if (postRef.current) {
       try {
-        const dataUrl = await toPng(postRef.current, { quality: 1.0 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const dataUrl = await toPng(postRef.current, {
+          quality: 1.0,
+          cacheBust: true,
+          pixelRatio: 2,
+          skipAutoScale: true,
+          style: {
+            visibility: 'visible',
+            'background-color': 'white'
+          }
+        });
+
         const link = document.createElement('a');
-        link.download = `${platform}-post.png`;
+        link.download = `${platform}-post-${Date.now()}.png`;
         link.href = dataUrl;
         link.click();
       } catch (err) {
         console.error('Error generating image:', err);
+        alert('Error generating image. Please try again.');
       }
     }
   };

@@ -224,18 +224,24 @@ export const SocialMediaPost = React.forwardRef<HTMLDivElement, SocialMediaPostP
       <div
         ref={ref}
         className={`w-[600px] rounded-xl ${getPlatformStyles()}`}
+        style={{ backgroundColor: platform === 'twitter' ? '#000' : '#fff' }}
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
-                <img
-                  src={profilePic || '/default-avatar.png'}
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                  crossOrigin="anonymous"
-                  loading="eager"
-                />
+                {profilePic ? (
+                  <img
+                    src={profilePic}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-500">?</span>
+                  </div>
+                )}
               </div>
               <div>
                 <p className={`font-bold ${platform === 'twitter' || platform === 'tiktok' ? 'text-white' : 'text-gray-900'}`}>
