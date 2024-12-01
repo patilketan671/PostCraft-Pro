@@ -230,9 +230,10 @@ export const SocialMediaPost = React.forwardRef<HTMLDivElement, SocialMediaPostP
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <img
-                  src={profilePic || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop'}
+                  src={profilePic || '/default-avatar.png'}
                   alt="Profile"
                   className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                  crossOrigin="anonymous"
                 />
               </div>
               <div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
 import { 
   Camera, 
@@ -35,6 +35,8 @@ export function PostGenerator() {
   const [username, setUsername] = useState('@username');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [profileImageData, setProfileImageData] = useState<string | null>(null);
+  const [defaultProfilePic, setDefaultProfilePic] = useState<string | null>(null);
   
   const postRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +88,39 @@ export function PostGenerator() {
     }
   };
 
+  const preloadImage = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error preloading image:', error);
+      return null;
+    }
+  };
+
+  const preloadDefaultProfilePic = async () => {
+    try {
+      const response = await fetch('https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop');
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDefaultProfilePic(reader.result as string);
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error('Error preloading default profile pic:', error);
+    }
+  };
+
+  useEffect(() => {
+    preloadDefaultProfilePic();
+  }, []);
+
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto">
@@ -102,7 +137,7 @@ export function PostGenerator() {
                 likes={1234}
                 shares={56}
                 imageUrl={imageUrl}
-                profilePic={profilePic}
+                profilePic={profilePic || defaultProfilePic}
               />
             </div>
           </div>
