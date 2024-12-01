@@ -234,6 +234,7 @@ export const SocialMediaPost = React.forwardRef<HTMLDivElement, SocialMediaPostP
                   alt="Profile"
                   className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
                   crossOrigin="anonymous"
+                  loading="eager"
                 />
               </div>
               <div>

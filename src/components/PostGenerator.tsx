@@ -40,18 +40,31 @@ export function PostGenerator() {
   
   const postRef = useRef<HTMLDivElement>(null);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'post' | 'profile') => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'post' | 'profile') => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === 'post') {
-          setImageUrl(reader.result as string);
-        } else {
-          setProfilePic(reader.result as string);
-        }
-      };
+      
+      const imageLoadPromise = new Promise((resolve) => {
+        reader.onloadend = () => {
+          const img = new Image();
+          img.src = reader.result as string;
+          img.onload = () => {
+            resolve(reader.result);
+          };
+        };
+      });
+
       reader.readAsDataURL(file);
+
+      const result = await imageLoadPromise;
+      
+      if (type === 'post') {
+        setImageUrl(result as string);
+      } else {
+        setProfilePic(result as string);
+        setDefaultProfilePic(result as string);
+      }
     }
   };
 
