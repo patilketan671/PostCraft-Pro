@@ -48,11 +48,16 @@ export function PostGenerator() {
         return;
       }
 
-      const reader = new FileReader();
-      
       try {
-        const result = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result);
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            if (typeof reader.result === 'string') {
+              resolve(reader.result);
+            } else {
+              reject(new Error('Failed to read file'));
+            }
+          };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
@@ -61,15 +66,15 @@ export function PostGenerator() {
           const img = new Image();
           img.onload = resolve;
           img.onerror = reject;
-          img.src = result as string;
+          img.src = base64Data;
         });
 
         if (type === 'post') {
-          setImageUrl(result as string);
+          setImageUrl(base64Data);
         } else {
-          setProfilePic(result as string);
-          setDefaultProfilePic(result as string);
-          setProfileImageData(result as string);
+          setProfilePic(base64Data);
+          setDefaultProfilePic(base64Data);
+          setProfileImageData(base64Data);
         }
       } catch (error) {
         console.error('Error processing image:', error);
@@ -81,7 +86,7 @@ export function PostGenerator() {
   const downloadPost = async () => {
     if (postRef.current) {
       try {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         const dataUrl = await toPng(postRef.current, {
           quality: 1.0,
@@ -90,7 +95,13 @@ export function PostGenerator() {
           skipAutoScale: true,
           style: {
             visibility: 'visible',
-            'background-color': 'white'
+            backgroundColor: 'white'
+          },
+          filter: (node) => {
+            if (node instanceof HTMLImageElement) {
+              return true;
+            }
+            return true;
           }
         });
 

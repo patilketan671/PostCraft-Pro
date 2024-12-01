@@ -231,11 +231,13 @@ export const SocialMediaPost = React.forwardRef<HTMLDivElement, SocialMediaPostP
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 {profilePic ? (
-                  <img
-                    src={profilePic}
-                    alt="Profile"
-                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                    loading="eager"
+                  <div 
+                    className="w-12 h-12 rounded-full border-2 border-gray-200 overflow-hidden"
+                    style={{
+                      backgroundImage: `url(${profilePic})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
